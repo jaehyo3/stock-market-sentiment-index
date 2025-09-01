@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% block title %}회원가입{% endblock %}
+{% block content %}
+<div class="container auth-container">
+    <div class="card auth-card">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('users_signup_bp.signup') }}">
+                <label for="signup-id">아이디</label>
+                <input type="text" id="signup-id" name="userid" value="{{ form.userid if form.userid else '' }}" placeholder="아이디를 입력하세요" required />
+                {% if errors.userid %}<p class="error-message">{{ errors.userid }}</p>{% endif %}
+
+                <label for="signup-pw">비밀번호</label>
+                <input type="password" id="signup-pw" name="password" placeholder="비밀번호를 입력하세요" required />
+                {% if errors.password %}<p class="error-message">{{ errors.password }}</p>{% endif %}
+
+                <label for="signup-pw2">비밀번호 확인</label>
+                <input type="password" id="signup-pw2" name="password2" placeholder="비밀번호를 다시 입력하세요" required />
+                {% if errors.password2 %}<p class="error-message">{{ errors.password2 }}</p>{% endif %}
+
+                <label for="signup-name">이름</label>
+                <input type="text" id="signup-name" name="name" value="{{ form.name if form.name else '' }}" placeholder="이름을 입력하세요" required />
+                {% if errors.name %}<p class="error-message">{{ errors.name }}</p>{% endif %}
+
+                <label for="signup-birth">생년월일</label>
+                <input type="text" id="signup-birth" name="birthdate" value="{{ form.birthdate if form.birthdate else '' }}" placeholder="예: 19990101" required />
+                {% if errors.birthdate %}<p class="error-message">{{ errors.birthdate }}</p>{% endif %}
+
+                <label for="signup-email">이메일</label>
+                <div style="display:flex; gap:8px; align-items: flex-start;">
+                <input type="email" id="signup-email" name="email" value="{{ form.email if form.email else '' }}" placeholder="이메일을 입력하세요" required style="flex:1;" />
+                <button type="button" id="email-send-btn" class="btn-outline">인증번호 발송</button>
+                </div>
+
+                {% if errors.email %}
+                <p class="error-message">{{ errors.email }}</p>
+                {% endif %}
+
+                <div style="display: flex; gap: 8px; margin-top: 8px; align-items: flex-start;">
+                <input type="text" id="email-code" name="email_code" placeholder="인증번호 입력" style="flex: 1;" />
+                <button type="button" id="email-verify-btn" class="btn-secondary">인증번호 확인</button>
+                </div>
+
+                <span id="email-verify-result" class="error-message"></span>
+
+                <label for="signup-phone">전화번호</label>
+                <input type="text" id="signup-phone" name="phone" value="{{ form.phone or '' }}" placeholder="전화번호를 입력하세요" required />
+                {% if errors.phone %}<p class="error-message">{{ errors.phone }}</p>{% endif %}
+
+                <div style="margin: 10px 0; display: flex; align-items: center; align-items: baseline; gap: 8px;">
+                    <input type="checkbox" style="width: 30px;" id="agree-terms" name="agree_terms" required {% if form.agree_terms %}checked{% endif %} />
+                    <label for="agree-terms">[필수] 이용약관에 동의합니다.</label>
+                </div>
+                {% if errors.terms %}
+                <p class="error-message">{{ errors.terms }}</p>
+                {% endif %}
+
+                {% if errors.required %}<p class="error-message">{{ errors.required }}</p>{% endif %}
+                {% if errors.db %}<p class="error-message">{{ errors.db }}</p>{% endif %}
+
+                <button type="submit" class="btn btn-primary full">회원가입</button>
+            </form>
+
+            <p class="auth-link">
+                이미 계정이 있으신가요? <a href="{{ url_for('users_login_bp.login') }}">로그인</a>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+{% endblock %}

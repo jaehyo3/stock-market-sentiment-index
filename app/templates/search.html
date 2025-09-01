@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+
+{% block title %}종목 검색{% endblock %}
+
+{% block content %}
+<h2>종목 검색</h2>
+<p>{{ user }}님 환영합니다.</p>
+
+<!-- 검색 폼 -->
+<form id="searchForm" method="GET" action="{{ url_for('stocks_search_bp.search') }}" autocomplete="off" style="position: relative;">
+  <div class="search-line">
+    <input type="text" name="search" id="searchInput" placeholder="종목명 입력" value="{{ search_query }}">
+    <button type="submit" class="btn btn-primary">검색</button>
+  </div>
+  <!-- 자동완성 추천 리스트 -->
+  <div id="searchAutocompleteList" class="autocomplete-list"></div>
+</form>
+
+{% if error_message %}
+    <p class="error-message">{{ error_message }}</p>
+{% endif %}
+
+{# 종목이 검색되었을 때만 아래 내용들을 보여줍니다. #}
+{% if search_result_name %}
+    <h3>검색 종목: {{ search_result_name }}({{ search_result_code }})</h3>
+
+    <!-- 1. AI 리포트 섹션 -->
+    <div class="section-container ai-report-section card" style="padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px;">
+        <h2 class="section-title" style="font-size: 1.8em; color: #333; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: center;">AI 리포트</h2>
+
+        <div class="report-action-area" style="text-align: center; margin-bottom: 20px;">
+            {% if search_result_code %}
+                <button type="button" id="generateAiReportBtn" class="btn btn-secondary" onclick="fetchAiReportForStock('{{ search_result_code }}')">
+                    AI 리포트 생성
+                </button>
+            {% else %}
+                <p class="no-data-message" style="color: #888;">리포트를 생성할 종목 코드를 찾을 수 없습니다.</p>
+            {% endif %}
+        </div>
+
+        <div id="aiReportContent" style="border: 1px solid #eee; padding: 15px; background-color: #ffffff; border-radius: 5px;">
+            <p style="text-align: center; color: #888;">'AI 리포트 생성' 버튼을 눌러주세요.</p>
+        </div>
+    </div>
+
+    <!-- 2. 뉴스 및 그래프 2단 레이아웃 컨테이너 -->
+    <div class="two-column-layout section-container" style="display: flex; justify-content: space-between;">
+        <!-- 뉴스 기사 컬럼 -->
+        <div class="column news-column" style="flex: 1; margin-right: 20px;">
+            <h2 class="section-title" style="font-size: 1.5em; margin-bottom: 10px;">뉴스 기사</h2>
+            <div id="news-container" class="card column-content-card">
+                <div id="news-list">
+                    <p>뉴스 기사를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 주가 그래프 컬럼 -->
+        <div class="column chart-column" style="flex: 1;">
+            <h2 class="section-title" style="font-size: 1.5em; margin-bottom: 10px;">{{ stock_name_for_chart }} 주가</h2>
+            {% if price_chart_data_json and price_chart_data_json|length > 2 %}
+                <div id="chart-container" class="card column-content-card">
+                    <canvas id="stockChart"></canvas>
+                </div>
+                <div id="priceChartDataContainer"
+                     data-chart-data='{{ price_chart_data_json | safe }}'
+                     data-stock-name="{{ stock_name_for_chart | default('') }}">
+                </div>
+            {% else %}
+                <p class="no-data-message" style="color: #888;">해당 종목의 유효한 주가 데이터를 찾을 수 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% elif search_query and not error_message %}
+    <p>일치하는 종목이 없습니다.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Font Awesome (로딩 스피너 사용 시 필요) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script src="{{ url_for('static', filename='js/search_chart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stock_news.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai_report.js') }}"></script>
+
+<script>
+    // ⭐ 중요: 이전에 여기에 있던 setupMainSearchAutocomplete 함수 정의는 이제 layout.html로 이동되었습니다.
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // ⭐ layout.html에 정의된 setupUniversalSearchAutocomplete 함수 호출
+        setupUniversalSearchAutocomplete("searchInput", "searchAutocompleteList", "/autocomplete");
+
+        const exactStockName = "{{ search_result_name | default('') }}".trim();
+        const stockCodeForReport = "{{ search_result_code | default('') }}".trim();
+
+        if (exactStockName) {
+            // 이 함수들은 search_chart.js, stock_news.js, ai_report.js 에 정의되어 있어야 합니다.
+            // window. 접두사를 사용하는 대신, 해당 스크립트 파일들에서 함수를 전역으로 노출시키거나
+            // 모듈 패턴을 사용하여 반환하는 것이 더 좋은 방법입니다.
+            // 현재 코드에서는 window.fetchNewsForStock, window.fetchAiReportForStock 으로 호출하고 있으므로
+            // 해당 js 파일에서 함수가 전역으로 노출되어 있다고 가정합니다.
+            if (typeof fetchNewsForStock !== 'undefined') {
+                fetchNewsForStock(exactStockName);
+            }
+        } else if ("{{ search_query | default('') }}".trim()) {
+            const newsListElem = document.getElementById('news-list');
+            if (newsListElem) {
+                newsListElem.innerHTML = '<p class="no-data-message">해당 종목에 대한 뉴스 기사를 찾을 수 없습니다.</p>';
+            }
+            const aiReportContentDiv = document.getElementById('aiReportContent');
+            if (aiReportContentDiv) {
+                aiReportContentDiv.innerHTML = '<p class="no-data-message">해당 종목의 AI 리포트를 찾을 수 없습니다.</p>';
+            }
+        }
+    });
+
+    function checkLogin() {
+        {% if not session.get('user') %}
+            alert('로그인 후 이용 가능합니다.');
+            return false;
+        {% else %}
+            return true;
+        {% endif %}
+    }
+</script>
+
+<style>
+/* 자동완성 목록 스타일 (search.html에서만 적용되도록 재정의하거나, layout.html의 공통 스타일로 관리) */
+#searchAutocompleteList {
+    position: absolute; /* 검색 입력 필드 아래에 정확히 위치 */
+    left: 0;
+    top: calc(100% + 5px); /* 입력 필드 바로 아래에 표시 (5px 여백) */
+    width: 100%; /* 입력 필드와 동일한 너비 */
+    background: #fff;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    display: none; /* 초기에는 숨김 */
+}
+.autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.autocomplete-item:hover, .autocomplete-item.selected {
+    background-color: #f0f4fa;
+}
+/* 기존 index.html 특정 스타일 (메인 검색 자동완성 목록)은 layout.html의 공통 스타일로 통합되거나 제거되어야 합니다. */
+/* #indexAutocompleteList { ... } 이 부분은 layout.html의 공통 스타일에서 관리하는 것이 좋습니다. */
+</style>
+{% endblock %}

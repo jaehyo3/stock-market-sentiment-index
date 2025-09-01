@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}내 정보{% endblock %}
+
+{% block content %}
+
+<div class="info-container">
+    <h1>{{ user.name }}님의 정보</h1>
+
+    <table>
+        <tr><td><strong>아이디:</strong></td><td>{{ user.userid }}</td></tr>
+        <tr><td><strong>이름:</strong></td><td>{{ user.name }}</td></tr>
+        <tr><td><strong>전화번호:</strong></td><td>{{ user.phone }}</td></tr>
+        <tr><td><strong>생년월일:</strong></td><td>{{ user.birthdate }}</td></tr>
+        <tr><td><strong>이메일:</strong></td><td>{{ user.email }}</td></tr>
+    </table>
+
+    <div class="info-actions">
+        <a href="{{ url_for('users_modify_bp.modify') }}">정보 수정</a> |
+        <a href="{{ url_for('users_signout_bp.signout') }}">회원 탈퇴</a> |
+        <a href="{{ url_for('web_index_bp.index') }}">메인으로</a>
+    </div>
+</div>
+{% endblock %}

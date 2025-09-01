@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}회원 목록 관리{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>회원 목록 관리</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>아이디</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>전화번호</th>
+                <th>생년월일</th>
+                <th>관리자</th>
+                <th>수정</th>
+                <th>활성/비활성 전환</th>
+                <th>삭제</th>
+                <th>활성상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr {% if not user.is_active %}style="background-color: #f8d7da;"{% endif %}>
+                <td>{{ user.userid }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone }}</td>
+                <td>{{ user.birthdate }}</td>
+                <td>{{ '✅' if user.is_admin else '❌' }}</td>
+
+                <td>
+                    {% if not user.is_admin %}
+                    <form method="GET" action="{{ url_for('users_admin_bp.edit_user', userid=user.userid) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-secondary">수정</button>
+                    </form>
+                    {% else %}
+                    <span style="color: gray;">-</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if not user.is_admin %}
+                        {% if user.is_active %}
+                        <form method="POST" action="{{ url_for('users_admin_bp.deactivate_user', userid=user.userid) }}" style="display:inline;" onsubmit="return confirm('정말 비활성화하시겠습니까?');">
+                            <button type="submit" class="btn-deactivate">비활성화</button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('users_admin_bp.activate_user', userid=user.userid) }}" style="display:inline;" onsubmit="return confirm('다시 활성화하시겠습니까?');">
+                            <button type="submit" class="btn-activate">활성화</button>
+                        </form>
+                        {% endif %}
+                    {% else %}
+                    <span style="color: gray;">-</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if not user.is_admin %}
+                    <form method="POST" action="{{ url_for('users_admin_bp.delete_user', userid=user.userid) }}" style="display:inline;" onsubmit="return confirm('정말 완전히 삭제하시겠습니까? 복구 불가합니다.');">
+                        <button type="submit" class="btn btn-danger">삭제</button>
+                    </form>
+                    {% else %}
+                    <span style="color: gray;">-</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ '✅' if user.is_active else '❌' }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

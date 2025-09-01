@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}관리자 페이지{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>관리자 페이지</h1>
+    <p>회원 관리 기능을 사용할 수 있습니다.</p>
+
+    <!-- 예시 메뉴 -->
+        <a href="{{ url_for('users_admin_bp.user_list') }}"><button class="btn btn-outline">회원 목록 관리</button></a>
+    <!-- 추가 기능: 사용자 관리, 리포트 관리 등 자유롭게 구성 -->
+</div>
+{% endblock %}

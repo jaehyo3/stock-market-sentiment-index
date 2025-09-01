@@ -1,0 +1,1172 @@
+@charset "UTF-8";
+
+/* ───── 🔗 로고 링크 ───── */
+.logo-img {
+  height: 85px;
+  vertical-align: middle;
+}
+
+/* ───── 🌐 기본 설정 ───── */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* ───── 📦 레이아웃 ───── */
+header {
+  color: #222;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 30px 20px;
+  box-sizing: border-box;
+}
+
+.wrapper {
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 60px;
+  box-sizing: border-box;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #222;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* ───── 🎛 버튼 스타일 ───── */
+.btn,
+.btn-outline,
+.btn-primary,
+.btn-secondary {
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  display: inline-block;
+}
+
+.btn-outline {
+  background: white;
+  color: #222;
+  border: 2px solid #222;
+  min-width: 60px;
+}
+
+.btn-outline:hover {
+  background-color: #222;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  opacity: 0.9;
+}
+
+.bottom-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 30px;
+}
+.bottom-buttons a,
+.bottom-buttons button {
+  flex: 1 1 45%;
+}
+
+.btn-activate {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 10px 24px;
+  border-radius: 8px;
+}
+
+.btn-deactivate {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 10px 24px;
+  border-radius: 8px;
+}
+
+.more-button {
+  float: right;
+  font-size: 20px;
+  text-decoration: none;
+  color: #888;
+}
+.more-button:hover {
+  color: #000;
+}
+
+.prefer-float-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+  background-color: #007bff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+/* ───── 🔍 검색 영역 ───── */
+.search-section form {
+  margin-bottom: 20px;
+}
+
+.search-line {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.search-line input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 2px solid #ccc;
+  box-sizing: border-box;
+}
+
+.search-line button {
+  flex-shrink: 0;
+  white-space: nowrap;
+  height: 46px;
+}
+
+.related-stock-item {
+  width: fit-content;
+  margin-bottom: 8px;
+}
+
+#indexAutocompleteList {
+  color: black;
+
+
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+
+
+  background-color: white;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.autocomplete-item {
+  margin-left: 10px;
+}
+
+/* ───── 📦 카드 ───── */
+.card-top {
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 45px;
+  overflow: hidden;
+}
+
+.card-bottom {
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 45px;
+  overflow: hidden;
+}
+
+.card {
+  display: block;
+  align-items: center;
+}
+
+.card-body {
+  margin-top: 10px;
+  padding: 15px;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+canvas.no-resize {
+  width: auto !important;
+  height: auto !important;
+}
+
+/* ───── 뉴스 영역 ───── */
+
+.news-article {
+  max-width: 100%;
+  margin: 0 auto 10px auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  border-radius: 30px;
+}
+
+.news-box {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.news-box ul {
+  margin: auto 0;
+  gap: 10px;
+  display: flex;
+  border-radius: 30px;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.news-box li {
+  width: auto;
+  margin : 0;
+
+}
+
+.news-box > strong {
+  display: inline-block;
+  margin: 0 0 5px 0;
+  font-weight: bold;
+  align-items: flex-start;
+}
+
+/* ───── 📊 레이아웃 구성 ───── */
+.row, .row-nowrap {
+  display: flex;
+  gap: 20px;
+}
+
+.row {
+  flex-wrap: wrap;
+}
+.row-nowrap {
+  flex-wrap: nowrap;
+}
+
+.col {
+  flex: 1;
+  min-width: 300px;
+}
+
+.main-box {
+  width: 600px;
+  height: 300px;
+  padding: 20px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+}
+
+.min-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 메인 차트 임시 추가부분 */
+#main-slider {
+  position: relative;
+  overflow: hidden;
+  height: 700px;
+}
+
+.main-up-slide, .main-down-slide {
+  display: none;
+  transition: all 0.3s ease;
+}
+
+.main-up-slide.active, .main-down-slide.active {
+  display: block;
+}
+
+/* 여기까지 */
+
+
+.section-title {
+  font-weight: bold;
+  display: inline-block;
+}
+
+.section-bottom {
+  margin: 200px 0;
+}
+
+/* ───── 🔐 로그인 / 회원가입 ───── */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+form input {
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 50px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease;
+}
+
+.auth-link {
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.full {
+  width: 100%;
+  margin-top: 31px;
+}
+
+/* ───── 🌙 다크 모드 ───── */
+.dark-mode .prefer-popup {
+  background-color: #1c1c1c;
+}
+
+body.dark-mode {
+  background-color: #0b0b0b;
+  color: #eee;
+}
+
+body.dark-mode .card {
+  background-color: #1c1c1c;
+  border: 1px solid #444;
+}
+
+body.dark-mode .card-top {
+  background-color: #1c1c1c;
+  border: 1px solid #444;
+}
+
+body.dark-mode .card-bottom {
+  background-color: #1c1c1c;
+  border: 1px solid #444;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode button {
+  background-color: #333;
+  color: #eee;
+  border: 1px solid #666;
+}
+
+body.dark-mode .btn-outline {
+  background-color: #333;
+  border: 1px solid #aaa;
+}
+
+/* ──────────────── 📌 모달 영역 수정 1 ──────────────── */
+.modal {
+  display: flex;
+  align-items: baseline;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -30%);
+  background-color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  font-size: 14px;
+  text-align: center;
+}
+
+.modal button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 1000px;
+  overflow-y: auto;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.close {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ───── 선호 주식 설정 ───── */
+form label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+  display: block;
+}
+
+form input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul li {
+  max-width: 600px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+}
+
+
+ul li a {
+  flex-grow: 1;
+  font-size: 16px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+ul li a:hover {
+  text-decoration: underline;
+}
+
+ul li form button.btn-outline {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  font-size: 14px;
+}
+ul li form button.btn-outline:hover {
+  background-color: #a71d2a;
+}
+
+#suggestions {
+  position: absolute;
+  z-index: 1000;
+  max-width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: -10px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+#suggestions .autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+#suggestions .autocomplete-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* 에러 메시지 수정2 */
+.error-message {
+    color: #dc3545;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* ───── 📱 반응형 ───── */
+@media screen and (max-width: 600px) {
+  .bottom-buttons {
+    flex-direction: column;
+  }
+
+  .container,
+  .card,
+  .auth-card {
+    padding: 20px 10px;
+  }
+
+  ul li {
+    margin-left: 0;
+  }
+
+  .more-button {
+    float: none;
+    text-align: right;
+  }
+}
+
+/* 오른쪽 하단 버튼 */
+.prefer-float-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+  background-color: #007bff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+/* 팝업 박스 */
+.prefer-popup {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 350px;
+  max-height: 500px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  z-index: 999;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 팝업 헤더 */
+.prefer-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #007bff;
+  color: white;
+  padding: 12px 16px;
+  font-weight: bold;
+}
+
+/* 닫기 버튼 */
+.prefer-popup-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* 팝업 내부 내용 */
+.prefer-popup-body {
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ───── 회원탈퇴 ───── */
+
+.signout-card {
+  max-width: 480px;
+  margin: 100px auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.signout-card h2 {
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+}
+
+.signout-card p {
+  color: #555;
+  margin-bottom: 32px;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background-color: #ccc;
+  color: black;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* ───── 회원정보 ───── */
+
+.info-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.info-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.info-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.info-container td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+.info-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+.info-actions a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #007BFF;
+}
+
+/* ───── 관리자 모드 ───── */
+
+.admin-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.admin-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #999;
+  border-radius: 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+  cursor: pointer;
+}
+
+.admin-checkbox input[type="checkbox"]:checked {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+.admin-checkbox label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+/* 심리지수 박스 */
+.sentiment-score .score-box {
+  background-color: #e0f7fa;
+  border-left: 8px solid #00bcd4;
+  padding: 20px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.score-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+.score-label {
+  font-size: 1.2rem;
+  color: #0097a7;
+}
+
+/* 차트 영역 */
+.chart-section .chart-placeholder {
+  background-color: #fff;
+  border: 2px dashed #ccc;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  margin-top: 10px;
+}
+
+/* 종목 리스트 */
+.top-stocks ul {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  list-style: none;
+}
+.top-stocks li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+.top-stocks li:last-child {
+  border-bottom: none;
+}
+
+/* 실시간 댓글 */
+.realtime-comments ul {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  list-style: none;
+}
+.realtime-comments li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+.realtime-comments li:last-child {
+  border-bottom: none;
+}
+
+.intro-section, .feature-section, .cta-section {
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.intro-section h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.feature-section ul {
+  padding-left: 20px;
+}
+
+.feature-section li {
+  margin-bottom: 10px;
+}
+
+.promising-section {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.promising-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+}
+
+.promising-stocks {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.stock-card {
+  flex: 1;
+  background-color: white;
+  border-bottom: 4px solid red;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 16px;
+  transition: transform 0.3s ease;
+}
+
+.stock-card:hover {
+  transform: translateY(-4px);
+}
+
+.promising-news {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.news-item {
+  background-color: white;
+  border-left: 4px solid gray;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.news-item h4 {
+  margin: 0 0 6px;
+}
+.news-item p {
+  margin: 0;
+  color: #555;
+}
+
+.market-toss-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 50vh;
+  margin-top: 30px;
+}
+
+.market-toss-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+.market-toss-card {
+  flex: 1;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 6px 32px 0 rgba(44,49,80,0.08);
+  padding: 32px 28px 24px 28px;
+}
+.market-toss-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.market-toss-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.market-toss-row {
+  background: #f8fafd;
+  border-radius: 16px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 컬럼 간 간격 */
+  padding: 8px 14px 8px 18px;
+  font-size: 15px; /* ⭐ 폰트 사이즈 통일 (헤더와 데이터 행의 기준) */
+  font-weight: 600;
+  box-shadow: 0 2px 12px #f2f2f3;
+  transition: box-shadow .15s;
+}
+
+.market-toss-row:hover { box-shadow: 0 6px 32px #e4e4e8;}
+.market-toss-name { flex: 1.2; }
+.market-toss-price { flex: 0.8;}
+.market-toss-rate { flex: 0.7; text-align: right; }
+.market-toss-spark { flex: 1; display: flex; align-items: center;}
+/* 글씨/아이콘 크기 등은 필요시 조정 */
+
+.market-toss-name {
+  width: 88px;         /* 숫자 원하는대로 조정 (78~98px에서 조절) */
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;      /* flex나 inline-block보다 block이 말줄임에 안정적 */
+}
+
+
+.market-toss-price,
+.market-toss-volume,
+.market-toss-trend {
+  font-size: 15px;             /* 균형 맞게 살짝 줄임 */
+}
+
+/* 혹시 새로 추가된 거래량, 추세 칼럼 있으면 flex: 0.9 등으로 맞춤 */
+.market-toss-volume { flex: 0.9; text-align: right; }
+.market-toss-trend { flex: 0.6; text-align: right; }
+
+/* static/css/style.css (또는 해당 파일) */
+
+/* ... 기존의 다른 CSS 코드들 ... */
+
+/* search.html 관련 스타일 (AI 리포트, 뉴스, 차트 등) */
+
+/* 기존의 #searchAutocompleteList 스타일은 그대로 유지 (search.html에서 가져온 경우) */
+#searchAutocompleteList {
+    position:absolute;
+    left:0; top:50px;
+    width:100%;
+    background:#fff;
+    border-radius:5px;
+    z-index:99;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: none;
+}
+
+/* 새로운 레이아웃을 위한 CSS 추가 및 수정 */
+.section-container {
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.section-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-left: 0;
+    color: #333;
+}
+
+/* 모든 'card' 클래스에 적용되는 공통 스타일 */
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 25px;
+}
+
+/* AI 리포트 섹션 */
+.ai-report-section {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+#aiReportContent {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 500px;
+    padding-right: 10px;
+}
+
+
+/* 뉴스 및 그래프 2단 레이아웃 컨테이너 */
+.two-column-layout {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.two-column-layout .column {
+    flex: 1 1 calc(50% - 15px);
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 각 컬럼 내부의 카드 스타일 */
+.column-content-card {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* 뉴스 목록 내부 스타일 */
+#news-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 400px;
+    padding-right: 10px;
+}
+
+#news-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#news-list li {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #eee;
+}
+
+#news-list li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+#news-list li a:hover {
+    background-color: #f0f4f7;
+}
+
+
+/* 차트 컨테이너 높이 조정 */
+#chart-container {
+    flex-grow: 1;
+    min-height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Chart.js 캔버스 자체 스타일 */
+#stockChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* 데이터가 없을 때 표시되는 메시지 스타일 */
+.no-data-message {
+    text-align: center;
+    color: #aaa;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+/* 로딩 스피너를 위한 CSS */
+.fa-spinner {
+    animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(359deg); }
+}
+
+/* 모바일 반응형 조정 */
+@media (max-width: 768px) {
+    .two-column-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .two-column-layout .column {
+        flex: 1 1 100%;
+        min-width: unset;
+    }
+    #news-list, #chart-container, #aiReportContent {
+        max-height: 300px;
+    }
+}
+
+/* ⭐ 추가된 search-help-text, service-intro 스타일도 여기에 붙여넣습니다. */
+.search-help-text {
+    margin-top: 15px;
+    margin-bottom: 30px;
+    padding: 10px 15px;
+    background-color: #eef7ff;
+    border: 1px solid #d0e8ff;
+    border-radius: 8px;
+    font-size: 0.95em;
+    color: #336699;
+    display: flex;
+    align-items: center;
+}
+
+.search-help-text .fas {
+    margin-right: 8px;
+    color: #5aa1e3;
+}
+
+.service-intro {
+    margin-top: 10px;
+    margin-bottom: 25px;
+    font-size: 1.05em;
+    color: #555;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.service-intro .fas {
+    margin-right: 8px;
+    color: #007bff;
+}
+
+.signal-up {
+    color: red;  /* 상승 화살표는 빨간색 */
+}
+
+.signal-down {
+    color: blue;  /* 하락 화살표는 파란색 */
+}
+
+.signal-neutral {
+    color: gray;  /* 변화 없음은 회색 */
+}

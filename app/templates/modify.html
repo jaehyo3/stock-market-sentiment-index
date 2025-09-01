@@ -1,0 +1,103 @@
+{% extends 'layout.html' %}
+
+{% block title %}회원정보 수정{% endblock %}
+
+{% block content %}
+    <form method="post" action="{{ url_for('users_modify_bp.modify') }}">
+        <div>
+            <h2>회원정보 수정</h2>
+
+            <div>
+                <label for="name">이름:</label>
+                <input type="text" id="name" name="name" value="{{ user.name }}" required>
+                {% if name_error %}
+                    <div class="error-message">{{ name_error }}</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="phone">휴대폰 번호:</label>
+                <input type="tel" id="phone" name="phone" value="{{ user.phone }}"
+                       placeholder="01012345678" pattern="[0-9]{10,11}" title="숫자만 입력하세요 (10-11자리)" required>
+                {% if phone_error %}
+                    <div class="error-message">{{ phone_error }}</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="birthdate">생년월일:</label>
+                <input type="text" id="birthdate" name="birthdate" value="{{ user.birthdate.replace('-', '') }}"
+                       placeholder="YYYYMMDD (예: 19900101)" pattern="[0-9]{8}" title="YYYYMMDD 형식의 8자리 숫자를 입력하세요" required>
+                {% if birthdate_error %}
+                    <div class="error-message">{{ birthdate_error }}</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="email">이메일:</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                {% if email_error %}
+                    <div class="error-message">{{ email_error }}</div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="form-button-group">
+            <button type="button" id="togglePasswordBtn" class="btn-secondary">비밀번호 변경</button>
+        </div>
+
+        <div id="passwordFields" style="display: {% if password_fields_visible %} block {% else %} none {% endif %};">
+            <h2>비밀번호 변경</h2>
+            <p>비밀번호를 변경하려면 아래 필드를 채우세요.</p>
+            <div>
+                <label for="current_password">현재 비밀번호:</label>
+                <input type="password" id="current_password" name="current_password">
+                {% if current_password_error %}
+                    <div class="error-message">{{ current_password_error }}</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="new_password">새 비밀번호:</label>
+                <input type="password" id="new_password" name="new_password" minlength="6" title="새 비밀번호는 최소 6자 이상이어야 합니다.">
+                {% if new_password_error %}
+                    <div class="error-message">{{ new_password_error }}</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="confirm_password">새 비밀번호 확인:</label>
+                <input type="password" id="confirm_password" name="confirm_password">
+                {% if confirm_password_error %}
+                    <div class="error-message">{{ confirm_password_error }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="form-button-group bottom-buttons">
+            <a href="{{ url_for('users_profile_bp.profile') }}" class="btn-secondary">취소</a>
+            <button type="submit" class="btn-primary">정보 수정 완료</button>
+        </div>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+            const passwordFields = document.getElementById('passwordFields');
+
+            togglePasswordBtn.addEventListener('click', () => {
+                if (passwordFields.style.display === 'block') {
+                    passwordFields.style.display = 'none';
+                    document.getElementById('current_password').value = '';
+                    document.getElementById('new_password').value = '';
+                    document.getElementById('confirm_password').value = '';
+                } else {
+                    passwordFields.style.display = 'block';
+                }
+            });
+        });
+    </script>
+{% endblock %}

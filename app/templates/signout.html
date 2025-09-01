@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block title %}회원탈퇴{% endblock %}
+
+{% block content %}
+
+<div class="signout-card">
+  <h2>정말 탈퇴하시겠습니까?</h2>
+  <p>탈퇴 후에는 계정 복구가 불가능합니다.<br>모든 정보가 영구 삭제됩니다.</p>
+
+  <form method="POST" action="{{ url_for('users_signout_bp.signout') }}">
+    <div class="btn-row">
+      <button type="submit" class="btn-danger">탈퇴하기</button>
+      <a href="{{ url_for('users_profile_bp.profile') }}" class="btn-cancel">취소</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

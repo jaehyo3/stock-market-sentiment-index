@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}모아 주식{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}{% endblock %}
+    <style>
+        /* (기존 스타일은 변경 없이 그대로 유지됩니다) */
+        .fav-container {
+            max-width:980px; margin:40px auto; background:#fff; border-radius:17px; box-shadow:0 2px 18px #ededed;
+            padding:38px 28px;
+            display:flex;
+            gap:32px;
+            flex-wrap: nowrap;
+        }
+        .fav-left { flex:1.3 0 0; position:relative; overflow-y:auto; }
+        .fav-right { flex:1 0 0; min-width:320px; overflow-y:auto; }
+        .fav-h2 { font-size:1.22em; margin-bottom:18px;}
+        .fav-table { width:100%; border-collapse:collapse; margin-top:6px; }
+        .fav-table th, .fav-table td { text-align:center; padding:10px 7px; border-bottom:1px solid #e4e4e4;}
+        .fav-table th { color:#1673e9; background:#f4f7fc; }
+        .fav-table tr:last-child td { border-bottom:none; }
+        .signal-up {color: #e53a3a; font-weight:700;}
+        .signal-down { color: #1976d2;; font-weight:700;}
+        .signal-neutral {color:#ffd02a; font-weight:700;}
+        .detail-panel {
+            background:#f7fafc; border-radius:15px; box-shadow:0 1px 7px #eee;
+            padding:28px 20px 18px 20px; min-height:310px; margin-top:12px; position:relative;
+            transition: all .18s;
+        }
+        .detail-title { font-size:1.11em; font-weight:800; margin-bottom:12px;}
+        .detail-close {
+            position:absolute; right:14px; top:16px; background:transparent; border:none; font-size:1.2em; color:#aaa; cursor:pointer;
+        }
+        .detail-row { margin:12px 0; }
+        .detail-label { color:#999; font-size:0.97em; margin-right:8px;}
+        .news-list { margin:14px 0 0 0; padding-left:0;}
+        .news-list li { margin-bottom:7px; color:#222; text-align:left;}
+        .mini-chart { height:44px; width:90px; display:inline-block; background:linear-gradient(90deg,#e4f2fe 30%,#fdf6e8 80%); }
+        .fav-table tr.selected { background:#f0faff; }
+        .fav-search-row { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; position: relative;}
+        .fav-search-row input { flex:1; padding: 8px 12px; border-radius:7px; border:1px solid #ddd;}
+        .fav-search-row button { min-width: 60px; }
+        #suggestions {position:absolute; z-index:1000; background:#fff; width:260px; border-radius:7px; box-shadow:0 2px 8px #e6e6e6; margin-top:40px;}
+        .autocomplete-item {padding:7px 14px; cursor:pointer;}
+        .autocomplete-item:hover {background:#f1f3f7;}
+        @media(max-width:1000px) {
+          .fav-container { flex-direction:column; gap:20px;}
+          .fav-right { min-width:0; }
+        }
+
+        #favoriteModal > div {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 140px);
+        }
+        #favoriteModal .fav-container {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .autocomplete-item:hover, .autocomplete-item.selected {
+            background-color: #f0f4fa;
+        }
+        #indexAutocompleteList {
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- 상단 헤더 -->
+    <header class="header">
+            <h1>
+                <a href="{{ url_for('web_index_bp.index') }}" class="logo-link">
+                    <img src="{{ url_for('static', filename='image/logo.png') }}" alt="모아 주식 로고" class="logo-img">
+                </a>
+            </h1>
+        <div class="header-buttons">
+            <!-- 다른 버튼들의 링크는 이미 올바른 규칙을 따르고 있으므로 수정할 필요가 없습니다. -->
+            {% if session.get('user') %}
+                <a href="{{ url_for('users_profile_bp.profile') }}"><button class="btn btn-outline">내 정보</button></a>
+                <a href="{{ url_for('users_logout_bp.logout') }}"><button class="btn btn-outline">로그아웃</button></a>
+                {% if session.get('is_admin') %}
+                    <a href="{{ url_for('users_admin_bp.admin') }}"><button class="btn btn-warning">🛠 관리자 모드</button></a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('users_login_bp.login') }}"><button class="btn btn-outline">로그인</button></a>
+                <a href="{{ url_for('users_signup_bp.signup') }}"><button class="btn btn-primary">회원가입</button></a>
+            {% endif %}
+            <button class="btn btn-primary" onclick="openFavoriteModal()">⭐ 관심주</button>
+        </div>
+    </header>
+
+    <!-- 본문 -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        © 2025 AI 주식 어드바이저 모아 주식
+    </footer>
+</div>
+
+<!-- ⭐ 관심주 모달 (이하 내용은 수정할 필요가 없습니다) -->
+<div id="favoriteModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:999;">
+  <div style="background:#fff; border-radius:20px; box-shadow:0 8px 30px #d0d8e6aa; width:900px; max-width:96vw; margin:70px auto; padding:0; position:relative;">
+    <button onclick="closeFavoriteModal()" style="position:absolute; top:15px; right:19px; background:transparent; border:none; font-size:1.45em; color:#aaa; z-index:2;">✕</button>
+    <div class="fav-container">
+      {% if session.get('user') %}
+        <div class="fav-left" style="position:relative;">
+          <h2 class="fav-h2">👀 관심주 현황</h2>
+          <form id="add-stock-form" action="{{ url_for('users_prefer_stock_bp.prefer_stock') }}" method="POST" autocomplete="off" class="fav-search-row" onsubmit="return false;">
+              <input id="stock_input" name="stock_input" type="text" placeholder="종목명 검색" autocomplete="off" />
+              <input type="hidden" id="stock_code" name="stock_code" />
+              <button type="button" class="btn btn-primary" id="addStockButton">추가</button>
+            </form>
+          <div id="suggestions"></div>
+          <ul id="prefer-stock-list"></ul>
+
+<table class="fav-table">
+  <thead>
+    <tr>
+      <th>종목명</th>
+      <th>미니차트</th>
+      <th>현재가</th>
+      <th>전일비</th>
+      <th>거래량</th>
+      <th>상세</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for stock in stock_display %}
+    <tr>
+      <td><b>${stock.name}</b><br><span style="font-size:0.96em;color:#bbb;">(${stock.code})</span></td>
+      <td>
+        <div class="mini-chart-svg-container"></div>
+      </td>
+      <td>${stock.price}원</td>
+      <td>
+        <span class="${stock.change_color_class}">
+          ${stock.price_change_amount}
+        </span>
+      </td>
+      <td>${stock.volume}</td>
+      <td>
+        <button onclick="showStockDetail('${stock.code}', '${stock.name}')" style="padding:4px 13px; background:#1673e9; color:#fff; border:none; border-radius:7px; font-size:0.98em; cursor:pointer;">상세보기</button>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" style="color:#aaa;">관심주가 없습니다.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="fav-right">
+    <div class="detail-panel" id="stockDetailPanel" style="display:none;">
+        <button class="detail-close" onclick="hideStockDetail()">✕</button>
+        <h3 class="detail-title" id="detailStockName"></h3>
+        <p class="detail-row"><span class="detail-label">현재가:</span> <span id="detailPrice"></span>원</p>
+        <p class="detail-row"><span class="detail-label">전일비:</span> <span id="detailPercentageChange"></span></p>
+        <p class="detail-row"><span class="detail-label">신호:</span> <span id="detailSignal"></span></p>
+        <p class="detail-row"><span class="detail-label">거래량:</span> <span id="detailVolume"></span></p>
+
+        <div id="detailChartContainer" style="height:150px; margin-top:15px; border:1px solid #eee; border-radius:8px;">
+            <canvas id="detailStockChart"></canvas>
+        </div>
+
+        <div id="detailNewsList">
+            <p>뉴스를 불러오는 중...</p>
+        </div>
+
+        <button onclick="deleteStockFromDetailPanel()" id="deleteStockFromDetailButton"
+                style="padding:8px 15px; margin-top:20px; background:#e13c3c; color:#fff; border:none; border-radius:7px; font-size:1em; cursor:pointer; width:100%;">이 종목 삭제</button>
+    </div>
+    <div id="noStockSelectedMessage" style="text-align:center; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#aaa; font-size:1.1em;">
+        <p>상세 정보를 보려면 종목을 선택해주세요.</p>
+    </div>
+</div>
+      {% else %}
+        <div style="width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;">
+          <div style="font-size:1.17em; font-weight:700; margin-bottom:20px;">로그인이 필요한 서비스입니다</div>
+          <a href="{{ url_for('users_login_bp.login') }}">
+            <button class="btn btn-primary" style="padding:12px 32px;">로그인 하러가기</button>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/autocomplete.js') }}?v=20250805_fix"></script>
+<script>
+// (이하 JavaScript 코드는 수정할 필요 없이 그대로 유지됩니다)
+console.log("[DEBUG] layout.html custom script block started!");
+
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
+function openFavoriteModal() {
+    document.getElementById('favoriteModal').style.display = 'block';
+    const input = document.getElementById('stock_input');
+    const hidden = document.getElementById('stock_code');
+    const sugg = document.getElementById('suggestions');
+    const form = document.getElementById('add-stock-form');
+    const addStockButton = document.getElementById("addStockButton");
+    if (input && hidden && sugg && form && addStockButton) {
+        setupAutocomplete('stock_input', 'suggestions', '/autocomplete');
+        fetch('/prefer_stock', {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error || '관심주를 불러오지 못했습니다.');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.stock_display) {
+                renderStockList(data.stock_display);
+            } else {
+                console.error("관심주 로드 실패:", data.error || "알 수 없는 오류");
+            }
+        })
+        .catch(error => {
+            console.error("관심주를 불러오는 중 네트워크 오류:", error);
+        });
+    } else {
+        console.warn("openFavoriteModal: 자동완성 input/hidden/suggestions/form/button 중 하나 이상 없음. ID 확인 필요.");
+        console.warn("누락된 요소:", {input, hidden, sugg, form, addStockButton});
+    }
+}
+
+function closeFavoriteModal() {
+    document.getElementById('favoriteModal').style.display = 'none';
+    hideStockDetail();
+}
+
+function checkLogin() {
+    {% if not session.get('user') %}
+        alert('로그인 후 이용 가능합니다.');
+        return false;
+    {% else %}
+        return true;
+    {% endif %}
+}
+
+function setupUniversalSearchAutocomplete(inputId, listId, apiUrl) {
+    const searchInput = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    const form = searchInput?.closest('form');
+    if (!searchInput || !list || !form) {
+        console.warn("setupUniversalSearchAutocomplete: 필요한 요소가 없습니다.", {inputId, listId, searchInput, list, form});
+        return;
+    }
+    let selectedIndex = -1;
+    let suggestions = [];
+    const fetchSuggestions = async () => {
+        const query = searchInput.value.trim();
+        list.innerHTML = "";
+        selectedIndex = -1;
+        if (!query) {
+            list.style.display = 'none';
+            return;
+        }
+        try {
+            const res = await fetch(`${apiUrl}?query=${encodeURIComponent(query)}`);
+            suggestions = await res.json();
+            if (suggestions.length === 0) {
+                const noResultDiv = document.createElement("div");
+                noResultDiv.className = "autocomplete-item";
+                noResultDiv.textContent = "검색 결과가 없습니다.";
+                list.appendChild(noResultDiv);
+            } else {
+                suggestions.forEach((item, index) => {
+                    const div = document.createElement("div");
+                    div.className = "autocomplete-item";
+                    div.dataset.index = index;
+                    const label = `${item.종목명}(${String(item.주식코드).padStart(6, '0')})`;
+                    div.textContent = label;
+                    div.addEventListener("click", () => {
+                        searchInput.value = item.종목명;
+                        list.innerHTML = "";
+                        list.style.display = 'none';
+                        form.submit();
+                    });
+                    list.appendChild(div);
+                });
+            }
+            list.style.display = 'block';
+        } catch (err) {
+            console.error("공통 검색 자동완성 오류:", err);
+        }
+    };
+    searchInput.addEventListener("input", debounce(fetchSuggestions, 300));
+    searchInput.addEventListener("keydown", (e) => {
+        const items = list.querySelectorAll(".autocomplete-item");
+        if (items.length === 0) return;
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            updateSelection(items);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            updateSelection(items);
+        } else if (e.key === "Enter") {
+            if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+                e.preventDefault();
+                searchInput.value = suggestions[selectedIndex].종목명;
+                list.innerHTML = "";
+                list.style.display = 'none';
+                form.submit();
+            } else if (searchInput.value.trim() !== "") {
+                e.preventDefault();
+                form.submit();
+            }
+        }
+    });
+    document.addEventListener("click", (e) => {
+        if (!searchInput.contains(e.target) && !list.contains(e.target)) {
+            list.innerHTML = "";
+            list.style.display = 'none';
+            selectedIndex = -1;
+        }
+    });
+    function updateSelection(items) {
+        items.forEach((item, index) => {
+            if (index === selectedIndex) {
+                item.style.backgroundColor = "#e0e0e0";
+            } else {
+                item.style.backgroundColor = "";
+            }
+        });
+    }
+}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

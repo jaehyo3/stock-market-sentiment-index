@@ -1,0 +1,262 @@
+{% extends "layout.html" %}
+
+{% block title %}홈{% endblock %}
+
+{% block content %}
+    {% if session.get('user') %}
+        <p>{{ session.get('user') }}님 환영합니다!{% if session.get('is_admin') %} (관리자){% endif %}</p>
+    {% else %}
+        <p>로그인 후 이용 가능합니다.</p>
+    {% endif %}
+
+    <div class="search-section">
+        <form method="POST" action="{{ url_for('stocks_search_bp.search') }}" onsubmit="return checkLogin();" autocomplete="off">
+            <div class="search-line" style="position:relative;">
+                <input type="text" id="indexSearchInput" name="search" placeholder="종목명 검색" {% if not session.get('user') %}disabled{% endif %} autocomplete="off">
+                <button type="submit" class="btn btn-primary" {% if not session.get('user') %}disabled{% endif %}>검색</button>
+                <div id="indexAutocompleteList" class="autocomplete-list"></div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container">
+        <header class="main-header">
+            <h1>국내 주식시장 심리지수</h1>
+            <p style="text-align: center; color: #555; margin-top: -20px; margin-bottom: 40px;">
+                AI 감성 분석을 활용한 실시간 시장 분위기 파악 서비스
+            </p>
+        </header>
+
+        <section class="sentiment-score-section">
+            <h2>현재 시장 심리지수</h2>
+            <div class="sentiment-score-box">
+                <strong id="current-sentiment-score">...</strong> <span id="current-sentiment-text">...</span>
+                <div class="sentiment-ratio">
+                    <div id="positive-ratio-bar" class="ratio-bar positive">긍정 댓글: <span id="positive-ratio-text">--%</span></div>
+                    <div id="neutral-ratio-bar" class="ratio-bar neutral">중립 댓글: <span id="neutral-ratio-text">--%</span></div>
+                    <div id="negative-ratio-bar" class="ratio-bar negative">부정 댓글: <span id="negative-ratio-text">--%</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="market-analysis-summary-section">
+            <h2>주요 시장 심리 분석</h2>
+            <div class="market-summary">
+                <p id="positive-summary-text">...</p>
+            </div>
+        </section>
+
+        <section class="chart-section">
+            <h2>최근 심리 변화 추이</h2>
+            <div class="chart-container" style="position: relative; height:300px; width:100%;">
+                <canvas id="sentimentChart"></canvas>
+            </div>
+        </section>
+
+        <section class="promising-section">
+            <h2>AI가 선정한 오늘의 유망주</h2>
+
+            <!-- ⭐ 아래 span 태그를 추가합니다 -->
+            {% if reference_time %}
+            <span class="reference-time">{{ reference_time }}</span>
+            {% endif %}
+
+            <div class="stock-list" id="promising-stocks-container"></div>
+        </section>
+
+        <section class="failing-stocks-section">
+            <h2>AI가 선정한 오늘의 패망주</h2>
+            <div class="stock-list" id="failing-stocks-container"></div>
+        </section>
+
+    </div>
+
+    <!-- ⭐ [수정 1] 모달창 HTML 구조 변경 (키워드 -> 요약) -->
+    <div id="stock-details-modal" class="stock-modal">
+        <div class="modal-content">
+            <button class="close-button">&times;</button>
+            <h3 id="modal-stock-name">종목명</h3>
+            <div class="modal-body">
+                <div class="chart-container">
+                    <canvas id="sentiment-doughnut-chart"></canvas>
+                    <div id="doughnut-score-text" class="doughnut-text"></div>
+                </div>
+                <div class="summary-container">
+                    <h4>AI 분석 요약</h4>
+                    <p id="modal-summary-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal-backdrop"></div>
+{% endblock %}
+
+
+{% block head %}
+<style>
+    /* --- 기존 CSS는 그대로 유지 --- */
+    .sentiment-score-section { background-color: #f9fbfb; padding: 25px; margin-bottom: 30px; border-radius: 8px; border: 1px solid #e0e6e9; }
+    .sentiment-score-box { text-align: center; padding: 20px; background-color: #e0f2f7; border-radius: 8px; }
+    .sentiment-score-box strong { font-size: 3.5em; color: #007bb5; margin-right: 15px; }
+    .sentiment-ratio { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; }
+    .ratio-bar { padding: 10px 15px; border-radius: 5px; font-weight: bold; color: #fff; }
+    .ratio-bar.positive { background-color: #28a745; }
+    .ratio-bar.neutral { background-color: #ffc107; }
+    .ratio-bar.negative { background-color: #dc3545; }
+    .market-analysis-summary-section { background-color: #f8f9fa; padding: 25px; margin-bottom: 30px; border-radius: 8px; border: 1px solid #e9ecef; }
+    .market-analysis-summary-section h2 { color: #34495e; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #e0e6e9; padding-bottom: 10px; font-size: 1.6em; }
+    .stock-list { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .stock-card { cursor: pointer; background-color: #fdfdfd; padding: 20px 25px; border-radius: 12px; border: 1px solid #f0f0f0; box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .stock-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+
+    /* ⭐ [수정 2] 모달창 CSS 변경 (키워드 -> 요약) */
+    #modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 1000; }
+    .stock-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); width: 500px; z-index: 1001; }
+    .stock-modal .modal-content { padding: 25px; position: relative; }
+    .stock-modal .close-button { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.0em; color: #aaa; cursor: pointer; }
+    .stock-modal h3 { text-align: center; margin-top: 0; margin-bottom: 25px; color: #2c3e50; font-size: 1.8em; }
+    .modal-body { display: flex; align-items: center; gap: 25px; }
+    .chart-container { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
+    .doughnut-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.8em; font-weight: bold; color: #333; }
+    .summary-container { flex-grow: 1; text-align: left; }
+    .summary-container h4 { margin-top: 0; margin-bottom: 10px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    #modal-summary-text {
+        font-size: 0.95em;
+        line-height: 1.6;
+        color: #333;
+        max-height: 140px; /* 긴 텍스트를 위한 최대 높이 제한 */
+        overflow-y: auto; /* 내용이 길면 스크롤 생성 */
+        margin: 0;
+        padding-right: 10px; /* 스크롤바 여백 */
+    }
+    div.container section.promising-section {
+    position: relative; /* << 이렇게 더 구체적으로 바꿔주세요 */
+    margin-bottom: 30px;
+    }
+
+    .reference-time {
+    position: absolute;
+    top: 0;  /* 제목(h2)과 같은 높이에 배치하기 위해 top을 0으로 조정 */
+    right: 5px; /* 오른쪽에서 5px 떨어진 위치 */
+    font-size: 13px;
+    color: #888;
+    font-weight: normal;
+
+    /* h2 태그의 높이가 있다면, line-height를 비슷하게 맞춰주면 수직 정렬이 더 예쁘게 됩니다. */
+    /* 예: h2의 line-height가 36px이라면 아래 속성 추가 */
+    line-height: 36px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 데이터 주입, renderStockCards 함수는 기존과 동일
+const market_data = {{ market_data|tojson }};
+const market_summary = {{ market_summary|tojson }};
+const promising_stocks = {{ promising_stocks|tojson }};
+const failing_stocks = {{ failing_stocks|tojson }};
+
+function renderStockCards(containerId, stocksData, stockType) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    if (!stocksData || stocksData.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #777;">해당 종목이 없습니다.</p>';
+        return;
+    }
+    stocksData.forEach((stock, index) => {
+        const changeRateClass = (stock.changeRate && parseFloat(stock.changeRate) < 0) ? 'negative' : '';
+        const card = document.createElement('div');
+        card.className = 'stock-card';
+        card.dataset.stockType = stockType;
+        card.dataset.index = index;
+        card.innerHTML = `
+            <h3>${stock.name || stock.stock_code}</h3>
+            <div class="price-info">
+                <span>현재가: ${stock.currentPrice || 'N/A'}</span>
+                <span class="change-rate ${changeRateClass}">${stock.changeRate || ''}</span>
+            </div>
+            <div>AI 심리: <span class="ai-sentiment ${stock.aiSentiment}">${stock.aiSentimentText || '분석 중'}</span></div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// 도넛 차트 그리기 함수는 기존과 동일
+let doughnutChartInstance = null;
+function renderDoughnutChart(score, ratios) {
+    const ctx = document.getElementById('sentiment-doughnut-chart').getContext('2d');
+    if (doughnutChartInstance) { doughnutChartInstance.destroy(); }
+    const total = (ratios.positive || 0) + (ratios.negative || 0) + (ratios.neutral || 0);
+    if (total === 0) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.font = "16px Arial"; ctx.fillStyle = "#888"; ctx.textAlign = "center"; ctx.fillText("비율 데이터 없음", ctx.canvas.width / 2, ctx.canvas.height / 2);
+        return;
+    }
+    doughnutChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: ['긍정', '부정', '중립'], datasets: [{ data: [ratios.positive, ratios.negative, ratios.neutral], backgroundColor: ['#28a745', '#dc3545', '#ffc107'], borderColor: '#fff', borderWidth: 2, }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } } });
+}
+
+// ⭐ [수정 3] 모달 초기화 함수에서 키워드 대신 'reason' 텍스트를 표시하도록 변경
+function initializeStockCardModals() {
+    const modal = document.getElementById('stock-details-modal');
+    const backdrop = document.getElementById('modal-backdrop');
+    if (!modal || !backdrop) return;
+
+    const modalStockName = document.getElementById('modal-stock-name');
+    const doughnutScoreText = document.getElementById('doughnut-score-text');
+    const modalSummaryText = document.getElementById('modal-summary-text'); // ID 변경
+    const closeButton = modal.querySelector('.close-button');
+
+    const openModal = (stockData) => {
+        if (!stockData || !stockData.sentiment_details) return;
+        const details = stockData.sentiment_details;
+
+        modalStockName.textContent = stockData.name;
+        doughnutScoreText.textContent = details.score.toFixed(1);
+
+        // 'reason' 텍스트를 모달에 표시
+        modalSummaryText.textContent = stockData.reason || '분석 요약 정보가 없습니다.';
+
+        renderDoughnutChart(details.score, details.ratios);
+        modal.style.display = 'block';
+        backdrop.style.display = 'block';
+    };
+
+    const closeModal = () => {
+        modal.style.display = 'none';
+        backdrop.style.display = 'none';
+    };
+
+    document.querySelectorAll('.stock-list').forEach(container => {
+        container.addEventListener('click', (event) => {
+            const card = event.target.closest('.stock-card');
+            if(card) {
+                const stockType = card.dataset.stockType;
+                const index = parseInt(card.dataset.index, 10);
+                const stockData = (stockType === 'promising') ? promising_stocks[index] : failing_stocks[index];
+                openModal(stockData);
+            }
+        });
+    });
+
+    closeButton.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', closeModal);
+}
+
+// --- 페이지 로딩 완료 후 실행될 메인 로직 ---
+document.addEventListener("DOMContentLoaded", function() {
+    // 시장 심리 지수 및 비율 업데이트
+    if (market_data && Object.keys(market_data).length > 0) { document.getElementById('current-sentiment-score').textContent = market_data.score ? market_data.score.toFixed(1) : 'N/A'; document.getElementById('current-sentiment-text').textContent = market_data.sentiment || '데이터 없음'; const ratios = market_data.ratios; if (ratios) { document.getElementById('positive-ratio-text').textContent = ratios.positive + '%'; document.getElementById('neutral-ratio-text').textContent = ratios.neutral + '%'; document.getElementById('negative-ratio-text').textContent = ratios.negative + '%'; } } else { document.querySelector('.sentiment-score-box').innerHTML = '<p>시장 심리 지수 데이터가 없습니다.</p>'; }
+    // 주요 시장 심리 분석 결과 업데이트
+    if(market_summary) { document.getElementById('positive-summary-text').textContent = market_summary.positive; }
+    // 유망주/주의종목 카드 렌더링
+    renderStockCards('promising-stocks-container', promising_stocks, 'promising');
+    renderStockCards('failing-stocks-container', failing_stocks, 'failing');
+    // 모달 기능 초기화
+    initializeStockCardModals();
+    // 자동완성 기능 초기화
+    try { setupUniversalSearchAutocomplete("indexSearchInput", "indexAutocompleteList", "/autocomplete"); } catch (e) { console.error("자동완성 기능 초기화 실패:", e); }
+    // 꺾은선 그래프 그리기
+    fetch('/api/market-sentiment-trend').then(response => { if (!response.ok) { throw new Error('Network response was not ok'); } return response.json(); }).then(data => { if (!data || data.length === 0) { document.getElementById('sentimentChart').parentElement.innerHTML = '<p>차트 데이터가 없습니다.</p>'; return; } const labels = data.map(item => item.date); const scores = data.map(item => item.score); const ctx = document.getElementById('sentimentChart').getContext('2d'); new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: '심리 점수', data: scores, borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)', tension: 0.1, fill: true, }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, suggestedMin: 30, suggestedMax: 80 } }, plugins: { legend: { display: false } } } }); }).catch(error => { console.error('Error fetching chart data:', error); document.getElementById('sentimentChart').parentElement.innerHTML = '<p>차트 데이터를 불러오는 데 실패했습니다.</p>'; });
+});
+</script>
+{% endblock %}

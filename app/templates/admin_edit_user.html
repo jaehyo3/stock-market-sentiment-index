@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}회원 수정{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>회원 수정 - {{ user.userid }}</h1>
+
+    <form method="POST" action="{{ url_for('users_admin_bp.edit_user', userid=user.userid) }}">
+        <label>아이디: {{ user.userid }}</label><br>
+        <label for="name">이름:</label>
+        <input type="text" id="name" name="name" value="{{ user.name }}" required><br>
+
+        <label for="email">이메일:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required><br>
+
+        <label for="phone">전화번호:</label>
+        <input type="tel" id="phone" name="phone" value="{{ user.phone }}"><br>
+
+        <label for="birthdate">생년월일:</label>
+        <input type="text" id="birthdate" name="birthdate" value="{{ user.birthdate }}"><br>
+
+        <label for="is_admin">관리자 권한:</label>
+        <div class="admin-checkbox">
+            <input type="checkbox" id="is_admin" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+            <label for="is_admin">부여하기</label>
+        </div>
+        <br>
+        <button type="submit" class="btn-primary">수정 완료</button>
+        <a href="{{ url_for('users_admin_bp.user_list') }}" class="btn-secondary">취소</a>
+    </form>
+</div>
+{% endblock %}
